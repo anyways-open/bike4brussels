@@ -316,17 +316,7 @@ function createMarker(loc, color = '#3FB1CE') {
  * Add hillshades to the map once it's loaded
  */
 map.on('load', function () {
-    map.addSource('dem', {
-        "type": "raster-dem",
-        "url": "mapbox://mapbox.terrain-rgb"
-    });
-    map.addLayer({
-        "id": "hillshading",
-        "source": "dem",
-        "type": "hillshade"
-        // insert below waterway-river-canal-shadow;
-        // where hillshading sits in the Mapbox Outdoors style
-    }, );//'waterway-river-canal-shadow');
+    
 });
 
 /**
