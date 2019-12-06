@@ -5,7 +5,7 @@ var location2Marker = undefined;
 var routes = {};
 let routeRequests = {};
 let language = "en";
-const availableProfiles = ["fast", "balanced", "brussels", "relaxed"];
+const availableProfiles = ["bicycle", "bicycle.balanced", "bicycle.comfort_safety", "bicycle.comfort_safety_speed"];
 let selectedProfile = "fast";
 
 //set the corect language
@@ -28,11 +28,11 @@ if (typeof(Storage) !== "undefined") {
  * @type {{fast: string, relaxed: string, balanced: string, brussels: string}}
  */
 const profileHtmlId = {
-    "fast": "fast-instruction",
-    "relaxed": "relaxed-instruction", // Currently not in use
-    "balanced": "balanced-instruction",
+    "bicycle": "fast-instruction",
+    "bicycle.comfort_safety_speed": "relaxed-instruction", // Currently not in use
+    "bicycle.balanced": "balanced-instruction",
     //"networks": "relaxed-instruction",
-    "brussels": "other-instruction"
+    "bicycle.comfort_safety": "other-instruction"
 };
 
 /**
@@ -108,17 +108,10 @@ function calculateAllRoutes(origin, destination, profiles = availableProfiles, i
  */
 function calculateRoute(origin, destination, profile = "balanced", instructions = true, lang = 'en') {
     // Swap around values for the API
-    const originS = swapArrayValues(origin);
-    const destinationS = swapArrayValues(destination);
+    const originS = origin; //swapArrayValues(origin);
+    const destinationS = destination; // swapArrayValues(destination);
 
-    // Construct the url
-    let profile_url;
-    if (profile == "fast") {
-        profile_url = "";
-    } else {
-        profile_url = profile;
-    }
-    const url = `${urls.route}/route?loc1=${originS}&loc2=${destinationS}&instructions=${instructions}&lang=${lang}` + (profile_url === "" ? "" : `&profile=${profile_url}`);
+    const url = `${urls.route}/route?loc=${originS}&loc=${destinationS}&instructions=${instructions}&lang=${lang}&profile=${profile}`;
     routes[profile] = [];
 
     if (routeRequests[profile]) {
@@ -144,7 +137,7 @@ function calculateRoute(origin, destination, profile = "balanced", instructions 
         let routeStops = [];
         let heightInfo = [];
 
-        route = json.route.features;
+        route = json.features;
         for (let i in route) {
             if (route[i].name === "Stop") {
                 routeStops.push(route[i]);
@@ -192,7 +185,7 @@ function calculateRoute(origin, destination, profile = "balanced", instructions 
         const calculatedRoute = map.getSource(profile);
         if (calculatedRoute) {
             // Just set the data
-            calculatedRoute.setData(json.route);
+            calculatedRoute.setData(json);
         } else {
             // Add a new layer
             if (profile === selectedProfile) {
@@ -201,7 +194,7 @@ function calculateRoute(origin, destination, profile = "balanced", instructions 
                     type: 'line',
                     source: {
                         type: 'geojson',
-                        data: json.route
+                        data: json
                     },
                     paint: {
                         'line-color':
@@ -222,7 +215,7 @@ function calculateRoute(origin, destination, profile = "balanced", instructions 
                     type: 'line',
                     source: {
                         type: 'geojson',
-                        data: json.route
+                        data: json
                     },
                     paint: {
                         'line-color': "grey",
@@ -316,7 +309,7 @@ function createMarker(loc, color = '#3FB1CE') {
  * Add hillshades to the map once it's loaded
  */
 map.on('load', function () {
-    
+
 });
 
 /**
